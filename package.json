@@ -1,0 +1,26 @@
+{
+  "name": "gitlab-webhook-cmd",
+  "version": "1.0.0",
+  "description": "according git commit message to execute command with @ character pattern",
+  "main": "index.js",
+  "keyswords": "gitlab webhook",
+  "scripts": {},
+  "bin": {
+    "gwc": "app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhou-yg/gitlab-webhook-cmd.git"
+  },
+  "author": "",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/zhou-yg/gitlab-webhook-cmd/issues"
+  },
+  "homepage": "https://github.com/zhou-yg/gitlab-webhook-cmd#readme",
+  "dependencies": {
+    "commander": "^2.15.1",
+    "koa": "^2.5.1",
+    "koa-body": "^4.0.2"
+  }
+}
