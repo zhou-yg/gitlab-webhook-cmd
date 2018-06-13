@@ -1,3 +1,5 @@
+#!/usr/bin/node
+
 const pkg = require('./package.json');
 const koa = require('koa');
 const fs = require('fs');
@@ -38,12 +40,12 @@ if (!config.path) {
 
 console.log(config);
 
-var message = '@sh:test.sh develop';
-console.log(/@sh\:[\s\S]+$/.test(message));
-if (/@sh\:[\S\s]+$/.test(message)) {
-  const shCmd = message.match(/@sh\:([\S\s]+)$/);
-  console.log(shCmd);
-}
+// var message = '@sh:test.sh develop';
+// console.log(/@sh\:[\s\S]+$/.test(message));
+// if (/@sh\:[\S\s]+$/.test(message)) {
+//   const shCmd = message.match(/@sh\:([\S\s]+)$/);
+//   console.log(shCmd);
+// }
 
 
 app.use(koaBody());
@@ -54,25 +56,23 @@ app.use((ctx, next) => {
   if (ctx.request.path === config.path && ctx.request.method === 'POST') {
     const token = ctx.get('x-gitlab-token');
     if (token === config.token) {
-      var gitlabJson;
-
-      try {
-        gitlabJson = JSON.parse(Object.keys(ctx.request.body)[0]);
-      } catch (e) {
-        m = ('gitlab-webhooker: Post data are not GitLab JSON');
-      }
+      var gitlabJson = ctx.request.body;
 
       if (gitlabJson) {
         const branch = (gitlabJson.object_kind === 'push') ? gitlabJson.ref.split('/').pop() : '';
         const message = gitlabJson.message;
 
+        console.log('commit message:', message);
         // shell
         if (/@sh\:[\w\s]+$/.test(message)) {
           const shCmd = message.match(/@sh\:([\S\s]+)$/);
+          console.log(`sh ${shCmd[1]}`);
           spawn('sh', shCmd[1].split(' '), {
             cwd: process.cwd(),
           });
+        } else {
         }
+        ctx.body = 'success';
       }
     } else {
       m = 'invalid token';
@@ -94,4 +94,4 @@ app.use((ctx) => {
 });
 
 
-// app.listen(defaultConfig.port);
+app.listen(config.port);
