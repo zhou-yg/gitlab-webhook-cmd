@@ -60,15 +60,21 @@ app.use((ctx, next) => {
 
       if (gitlabJson) {
         const branch = (gitlabJson.object_kind === 'push') ? gitlabJson.ref.split('/').pop() : '';
-        const message = gitlabJson.message;
+        const message = (gitlabJson.commits[gitlabJson.commits.length - 1] || {}).message;
 
         console.log('commit message:', message);
         // shell
-        if (/@sh\:[\w\s]+$/.test(message)) {
+        if (/@sh\:[\S\s]+$/.test(message)) {
           const shCmd = message.match(/@sh\:([\S\s]+)$/);
-          console.log(`sh ${shCmd[1]}`);
-          spawn('sh', shCmd[1].split(' '), {
+          console.log(`sh ${shCmd[1]}`, ',' ,shCmd[1], ',', shCmd[1].split(' '));
+          const p = spawn('sh', shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), {
             cwd: process.cwd(),
+          });
+          p.stderr.on('data', (data) => {
+            console.log(`p1:${data}`);
+          });
+          p.on('error', (err) => {
+            console.log(`p2: `, err);
           });
         } else {
         }
