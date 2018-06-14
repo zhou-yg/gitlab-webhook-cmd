@@ -30,6 +30,10 @@ const config = Object.assign(fileConfig, {
   port: commander.port,
   token: commander.token,
 });
+// const config = Object.assign({
+//   port: 12345,
+//   path: '/webhook',
+// }, fileConfig);
 
 if (!config.port) {
   config.port = 12345;
