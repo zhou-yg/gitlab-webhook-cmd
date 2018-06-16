@@ -54,6 +54,8 @@ console.log(config);
 
 app.use(koaBody());
 
+var preProcess = null;
+
 app.use((ctx, next) => {
   var m;
   var code;
@@ -71,14 +73,21 @@ app.use((ctx, next) => {
         if (/@sh\:[\S\s]+$/.test(message)) {
           const shCmd = message.match(/@sh\:([\S\s]+)$/);
           console.log(`sh ${shCmd[1]}`, ',' ,shCmd[1], ',', shCmd[1].split(' '));
-          const p = spawn('sh', shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), {
+
+          if (preProcess) {
+            preProcess.kill('SIGHUP');
+          }
+
+          preProcess = spawn('sh', shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), {
             cwd: process.cwd(),
           });
           p.stderr.on('data', (data) => {
             console.log(`p1:${data}`);
+            preProcess = null;
           });
           p.on('error', (err) => {
             console.log(`p2: `, err);
+            preProcess = null;
           });
         } else {
         }
