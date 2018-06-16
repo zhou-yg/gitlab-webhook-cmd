@@ -76,6 +76,7 @@ app.use((ctx, next) => {
 
           if (preProcess) {
             preProcess.kill('SIGHUP');
+            console.log('kill pre');
           }
 
           preProcess = spawn('sh', shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), {
