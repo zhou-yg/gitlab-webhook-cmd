@@ -82,11 +82,11 @@ app.use((ctx, next) => {
           preProcess = spawn('sh', shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), {
             cwd: process.cwd(),
           });
-          p.stderr.on('data', (data) => {
+          preProcess.stderr.on('data', (data) => {
             console.log(`p1:${data}`);
             preProcess = null;
           });
-          p.on('error', (err) => {
+          preProcess.on('error', (err) => {
             console.log(`p2: `, err);
             preProcess = null;
           });
