@@ -65,7 +65,7 @@ app.use((ctx, next) => {
       var gitlabJson = ctx.request.body;
 
       if (gitlabJson) {
-        const branch = (gitlabJson.object_kind === 'push') ? gitlabJson.ref.split('/').pop() : '';
+        const branch = (gitlabJson.object_kind === 'push') ? gitlabJson.ref.replace(/refs\/heads\//, '') : '';
         const message = (gitlabJson.commits[gitlabJson.commits.length - 1] || {}).message;
 
         console.log('commit message:', message);
@@ -79,7 +79,7 @@ app.use((ctx, next) => {
             console.log('kill pre');
           }
 
-          preProcess = spawn('sh', [...shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')), branch], {
+          preProcess = spawn('sh', [...shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, ''))], {
             cwd: process.cwd(),
           });
           preProcess.stderr.on('data', (data) => {
