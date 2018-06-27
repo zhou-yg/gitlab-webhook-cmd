@@ -72,7 +72,7 @@ app.use((ctx, next) => {
         // shell
         if (/@sh\:[\S\s]+$/.test(message)) {
           const shCmd = message.match(/@sh\:([\S\s]+)$/);
-          console.log(`sh ${shCmd[1]}`, ',' ,shCmd[1], ',', shCmd[1].split(' '));
+          console.log(`sh ${shCmd[1]}`, ',' ,shCmd[1], ',', shCmd[1].split(' '), branch);
 
           if (preProcess) {
             preProcess.kill('SIGHUP');
