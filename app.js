@@ -79,7 +79,12 @@ app.use((ctx, next) => {
             console.log('kill pre');
           }
 
-          preProcess = spawn('sh', [...shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, ''))], {
+          var shCmdArr = shCmd[1].split(' ').map(s => s.replace(/[\s\n]/g, '')).filter(_ => _);
+          if (shCmdArr.length === 1) {
+            shCmdArr = shCmdArr.concat(branch);
+          }
+
+          preProcess = spawn('sh', [...shCmdArr], {
             cwd: process.cwd(),
           });
           preProcess.stderr.on('data', (data) => {
