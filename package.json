@@ -1,6 +1,6 @@
 {
   "name": "gitlab-webhook-cmd",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "according git commit message to execute command with @ character pattern",
   "main": "index.js",
   "keyswords": "gitlab webhook",

@@ -9,13 +9,15 @@ const commander = require('commander');
 const args = process.argv;
 const koaBody = require('koa-body');
 const spawn = require('child_process').spawn;
+const net = require('net')
 
-const gwcConfigFile = path.join(process.cwd(), './gwcrc.json');
+const CWD = process.cwd();
+const gwcConfigFile = path.join(CWD, './gwcrc.json');
 var fileConfig = {};
 if (fs.existsSync(gwcConfigFile)) {
   fileConfig = require(gwcConfigFile);
 } else {
-  console.log(`gwcrc.json not found in cwd:${process.cwd()}`);
+  console.log(`gwcrc.json not found in cwd:${CWD}`);
 }
 
 commander
@@ -30,16 +32,14 @@ const config = Object.assign(fileConfig, {
   port: commander.port,
   token: commander.token,
 });
-// const config = Object.assign({
-//   port: 12345,
-//   path: '/webhook',
-// }, fileConfig);
-
 if (!config.port) {
   config.port = 12345;
 }
 if (!config.path) {
   config.path = '/webhook';
+}
+if (!config.token) {
+  config.token = 'gwc';
 }
 
 console.log(config);
@@ -83,9 +83,13 @@ app.use((ctx, next) => {
           if (shCmdArr.length === 1) {
             shCmdArr = shCmdArr.concat(branch);
           }
+          if (!fs.existsSync(shCmdArr[0])) {
+            console.log(`${shCmdArr[0]} not found in ${CWD}`);
+            return;
+          }
 
           preProcess = spawn('sh', [...shCmdArr], {
-            cwd: process.cwd(),
+            cwd: CWD,
           });
           preProcess.stderr.on('data', (data) => {
             console.log(`p1:${data}`);
@@ -118,5 +122,24 @@ app.use((ctx) => {
   ctx.body = 'not found';
 });
 
+var port = config.port;
+// 检测端口是否被占用
+function portIsOccupied (port) {
+ // 创建服务并监听该端口
+ var server = net.createServer().listen(port)
 
-app.listen(config.port);
+ server.on('listening', function () {
+   server.close() // 关闭服务
+   console.log('listen on: ', port);
+   app.listen(port);
+ });
+
+ server.on('error', function (err) {
+   if (err.code === 'EADDRINUSE') { // 端口已经被使用
+     portIsOccupied(port + 1);
+   }
+ })
+}
+
+// 执行
+portIsOccupied(port)
